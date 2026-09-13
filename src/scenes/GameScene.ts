@@ -6,6 +6,7 @@ import { canPour, pour, isSolved, shuffle } from '../systems/SortLogic';
 const TUBES_PER_ROW = 4;
 const COL_GAP = 150;
 const ROW_GAP = 380;
+const BOTTOM_ROW_Y = 1120; // 마지막 행의 y좌표(화면 하단, 엄지 도달 영역). 기존 startY(첫 행 y=420) 폐기.
 
 // 커스텀 이벤트는 Phaser.Scene이 기본 제공하는 this.events(=sys.events)를 그대로 사용한다.
 // 별도 EventEmitter 필드로 덮어쓰면 씬 재시작 시 내부 정리(cleanup) 배선이 끊겨
@@ -42,7 +43,7 @@ export class GameScene extends Phaser.Scene {
 
   private buildTubes() {
     const { width } = this.scale;
-    const startY = 420;
+    const numRows = Math.ceil(this.tubeState.length / TUBES_PER_ROW);
 
     this.tubeState.forEach((colors, index) => {
       const col = index % TUBES_PER_ROW;
@@ -51,7 +52,7 @@ export class GameScene extends Phaser.Scene {
       const rowWidth = (rowCols - 1) * COL_GAP;
       const rowStartX = width / 2 - rowWidth / 2;
       const x = rowStartX + col * COL_GAP;
-      const y = startY + row * ROW_GAP;
+      const y = BOTTOM_ROW_Y - (numRows - 1 - row) * ROW_GAP;
 
       const tube = new Tube(this, x, y, index, this.level.tubeCapacity, colors, (i) => this.onTubeTapped(i));
       this.tubeObjects.push(tube);
